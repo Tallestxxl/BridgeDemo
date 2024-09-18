@@ -56,10 +56,17 @@ def backwards(delay, steps):
 
 if __name__ == '__main__':
     while True:
-        delay = input("Time Delay (ms)?")  # raw_input() was renamed to input() in Python 3
-        steps = input("How many steps forward? ")
+        #delay = input("Time Delay (ms)?")  # raw_input() was renamed to input() in Python 3
+        delay = 3
+        #steps = input("How many steps forward? ")
+        steps = 40
+        #wacht op schakelaar
         GPIO.output(Waarschuwingslicht, 1)
+        time.sleep(2)
+        #slagboomomlaag
         forward(int(delay) / 1000.0, int(steps))
-        steps = input("How many steps backwards? ")
+        #steps = input("How many steps backwards? ")
+        #wacht op schakelaar
         backwards(int(delay) / 1000.0, int(steps))
+        #slagboomomhoog
         GPIO.output(Waarschuwingslicht, 0)
