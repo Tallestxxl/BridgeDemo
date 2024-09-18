@@ -1,4 +1,4 @@
-
+  
 import RPi.GPIO as GPIO
 import time
 
@@ -10,6 +10,7 @@ coil_B_1_pin = 23 # blue
 coil_B_2_pin = 24 # yellow
 
 Waarschuwingslicht = 25 #red
+schakelaar = 5
 
 # adjust if different
 StepCount = 8
@@ -28,6 +29,7 @@ GPIO.setup(coil_A_2_pin, GPIO.OUT)
 GPIO.setup(coil_B_1_pin, GPIO.OUT)
 GPIO.setup(coil_B_2_pin, GPIO.OUT)
 GPIO.setup(Waarschuwingslicht, GPIO.OUT)
+GPIO.setup(schakelaar, GPIO.IN)
 
 # Assuming you want to control the enable pin (declare it first)
 enable_pin = 18  # Replace with the actual GPIO pin number you want to use
@@ -55,18 +57,34 @@ def backwards(delay, steps):
             time.sleep(delay)
 
 if __name__ == '__main__':
-    while True:
-        #delay = input("Time Delay (ms)?")  # raw_input() was renamed to input() in Python 3
-        delay = 3
-        #steps = input("How many steps forward? ")
-        steps = 40
-        #wacht op schakelaar
-        GPIO.output(Waarschuwingslicht, 1)
-        time.sleep(2)
-        #slagboomomlaag
-        forward(int(delay) / 1000.0, int(steps))
-        #steps = input("How many steps backwards? ")
-        #wacht op schakelaar
-        backwards(int(delay) / 1000.0, int(steps))
-        #slagboomomhoog
+    while True: 
         GPIO.output(Waarschuwingslicht, 0)
+        # Wait until pin 5 (schakelaar) is connected to 5V 
+        print("Waiting for pin 5 (schakelaar) to go HIGH...") 
+        while GPIO.input(schakelaar) == GPIO.LOW: 
+            time.sleep(0.1) # Check every 100ms 
+        
+        print("Pin 5 is HIGH, proceeding with the code.") 
+        # Set warning light on 
+        GPIO.output(Waarschuwingslicht, 1) 
+        time.sleep(3)
+        delay = 3 
+        steps = 100 
+        
+        # Move forward (e.g., lower barrier) 
+        forward(int(delay) / 1000.0, int(steps)) 
+        
+        # Wait for the switch to be activated again to reverse 
+        print("Waiting for pin 5 (schakelaar) to go HIGH again...") 
+        while GPIO.input(schakelaar) == GPIO.LOW: 
+            time.sleep(0.1) 
+        
+        print("Pin 5 is HIGH again, reversing the steps.") 
+        
+        # Move backward (e.g., raise barrier) 
+        backwards(int(delay) / 1000.0, int(steps)) 
+                
+        # Turn off warning light
+        time.sleep(3) 
+        GPIO.output(Waarschuwingslicht, 0)
+
